@@ -1,18 +1,39 @@
+import { Link } from "react-router-dom";
+import "../styles/Register.css";
+
 function Register() {
   return (
-    <div>
-      <h1>Create Account</h1>
+    <div className="register-container">
+      <div className="register-card">
 
-      <input type="text" placeholder="Full Name" />
-      <br /><br />
+        <h1 className="logo">TaskFlow</h1>
+        <p className="subtitle">
+          Create your account and start managing tasks.
+        </p>
 
-      <input type="email" placeholder="Email" />
-      <br /><br />
+        <input
+          type="text"
+          placeholder="Full Name"
+        />
 
-      <input type="password" placeholder="Password" />
-      <br /><br />
+        <input
+          type="email"
+          placeholder="Email"
+        />
 
-      <button>Register</button>
+        <input
+          type="password"
+          placeholder="Password"
+        />
+
+        <button>Create Account</button>
+
+        <p className="login-text">
+          Already have an account?{" "}
+          <Link to="/">Login</Link>
+        </p>
+
+      </div>
     </div>
   );
 }
