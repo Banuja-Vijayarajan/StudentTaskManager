@@ -1,34 +1,42 @@
 import { Link } from "react-router-dom";
 import "../styles/Login.css";
 
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Card from "../components/Card";
+
 function Login() {
   return (
     <div className="login-container">
-      <div className="login-card">
+
+      <Card className="login-card">
 
         <h1 className="logo">TaskFlow</h1>
+
         <p className="subtitle">
           Organize your tasks. Achieve your goals.
         </p>
 
-        <input
+        <Input
           type="email"
-          placeholder="Enter your email"
+          placeholder="Email"
         />
 
-        <input
+        <Input
           type="password"
-          placeholder="Enter your password"
+          placeholder="Password"
         />
 
-        <button>Login</button>
+        <Button text="Login" />
 
         <p className="register-text">
-          Don't have an account?{" "}
+          Don't have an account?
+          {" "}
           <Link to="/register">Register</Link>
         </p>
 
-      </div>
+      </Card>
+
     </div>
   );
 }

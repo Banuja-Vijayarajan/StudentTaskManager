@@ -1,39 +1,47 @@
 import { Link } from "react-router-dom";
 import "../styles/Register.css";
 
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Card from "../components/Card";
+
 function Register() {
   return (
     <div className="register-container">
-      <div className="register-card">
+
+      <Card className="register-card">
 
         <h1 className="logo">TaskFlow</h1>
+
         <p className="subtitle">
-          Create your account and start managing tasks.
+          Create your account.
         </p>
 
-        <input
+        <Input
           type="text"
           placeholder="Full Name"
         />
 
-        <input
+        <Input
           type="email"
           placeholder="Email"
         />
 
-        <input
+        <Input
           type="password"
           placeholder="Password"
         />
 
-        <button>Create Account</button>
+        <Button text="Create Account" />
 
         <p className="login-text">
-          Already have an account?{" "}
+          Already have an account?
+          {" "}
           <Link to="/">Login</Link>
         </p>
 
-      </div>
+      </Card>
+
     </div>
   );
 }
