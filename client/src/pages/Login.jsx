@@ -6,21 +6,33 @@ import "../styles/Login.css";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Card from "../components/Card";
+import api from "../services/api";
 
 function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    function handleLogin() {
-        console.log("Email:", email);
-        console.log("Password:", password);
+async function handleLogin() {
 
-        if (email === "" || password === "") {
-            alert("Please fill in all fields.");
-        return;
-}
+    try {
+
+        const response = await api.post("/login", {
+            email,
+            password
+        });
+
+        console.log(response.data);
+
+        alert(response.data.message);
+
+    } catch (error) {
+
+        console.log(error);
+
     }
+
+}
 
     return (
         <div className="login-container">
