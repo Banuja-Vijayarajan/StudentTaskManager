@@ -15,6 +15,11 @@ function Login() {
     function handleLogin() {
         console.log("Email:", email);
         console.log("Password:", password);
+
+        if (email === "" || password === "") {
+            alert("Please fill in all fields.");
+        return;
+}
     }
 
     return (
