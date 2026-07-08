@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { loginUser } from "../services/auth";
+import { useNavigate } from "react-router-dom";
 
 import "../styles/Login.css";
 
@@ -9,26 +11,29 @@ import Card from "../components/Card";
 import api from "../services/api";
 
 function Login() {
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
 async function handleLogin() {
 
+    if (!email || !password) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
     try {
 
-        const response = await api.post("/login", {
-            email,
-            password
-        });
+        await loginUser(email, password);
 
-        console.log(response.data);
+        alert("Login Successful!");
 
-        alert(response.data.message);
+        navigate("/dashboard");
 
     } catch (error) {
 
-        console.log(error);
+        alert(error.message);
 
     }
 
