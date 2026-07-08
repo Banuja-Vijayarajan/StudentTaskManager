@@ -1,6 +1,10 @@
-import { getAuth } from "firebase/auth";
-import app from "../firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
-const auth = getAuth(app);
-
-export default auth;
+export async function registerUser(email, password) {
+  return await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+}
