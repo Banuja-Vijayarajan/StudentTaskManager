@@ -1,100 +1,109 @@
 import { useState } from "react";
-import { addTask } from "../services/taskService";
 import { auth } from "../firebaseConfig";
+import { addTask } from "../services/taskService";
+
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Stack
+} from "@mui/material";
+
+import AddTaskIcon from "@mui/icons-material/AddTask";
 
 function TaskForm({ onTaskAdded }) {
 
-    const [title,setTitle]=useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-    const [description,setDescription]=useState("");
+  async function handleSubmit(e) {
 
-    async function handleAddTask(){
+    e.preventDefault();
 
-        if(!title){
-
-            alert("Enter task title");
-
-            return;
-
-        }
-
-        try{
-
-            await addTask({
-
-                title,
-
-                description,
-
-                completed: false,
-
-                createdAt: new Date(),
-
-                userId: auth.currentUser.uid
-
-            });
-
-            onTaskAdded();
-
-            alert("Task Added!");
-
-            setTitle("");
-
-            setDescription("");
-
-        }
-
-        catch(error){
-
-            alert(error.message);
-
-        }
-
+    if (!title.trim()) {
+      alert("Task title is required.");
+      return;
     }
 
-    return(
+    await addTask({
+      title,
+      description,
+      completed: false,
+      userId: auth.currentUser.uid
+    });
 
-        <div>
+    setTitle("");
+    setDescription("");
 
-            <h2>Add New Task</h2>
+    onTaskAdded();
 
-            <input
+  }
 
-                placeholder="Task Title"
+  return (
 
-                value={title}
+    <Card
+      elevation={5}
+      sx={{
+        borderRadius: 4,
+        mb: 4
+      }}
+    >
 
-                onChange={(e)=>setTitle(e.target.value)}
+      <CardContent>
 
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          gutterBottom
+        >
+          ➕ Add New Task
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+
+          <Stack spacing={3}>
+
+            <TextField
+              label="Task Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              fullWidth
+              required
             />
 
-            <br/><br/>
-
-            <textarea
-
-                placeholder="Task Description"
-
-                value={description}
-
-                onChange={(e)=>setDescription(e.target.value)}
-
+            <TextField
+              label="Description"
+              multiline
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              fullWidth
             />
 
-            <br/><br/>
-
-            <button
-
-                onClick={handleAddTask}
-
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              startIcon={<AddTaskIcon />}
+              sx={{
+                borderRadius: 3,
+                py: 1.5
+              }}
             >
+              Add Task
+            </Button>
 
-                Add Task
+          </Stack>
 
-            </button>
+        </form>
 
-        </div>
+      </CardContent>
 
-    );
+    </Card>
+
+  );
 
 }
 
