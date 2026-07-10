@@ -1,38 +1,63 @@
+import { AppBar, Toolbar, Typography, Button, Avatar, Box } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../services/auth";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
-    const navigate = useNavigate();
-
-    async function handleLogout() {
-        try {
-            await logoutUser();
-            navigate("/");
-        } catch (error) {
-            console.error(error);
-            alert("Failed to logout.");
-        }
+  async function handleLogout() {
+    try {
+      await logoutUser();
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert("Logout failed.");
     }
+  }
 
-    return (
-        <nav
-            style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "20px",
-                background: "#5b4bdb",
-                color: "white",
-            }}
-        >
-            <h2>TaskFlow</h2>
+  return (
+    <AppBar
+      position="static"
+      elevation={3}
+      sx={{
+        background: "#5B4BDB",
+        borderRadius: "0 0 20px 20px",
+      }}
+    >
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="h5" fontWeight="bold">
+          🚀 TaskFlow Pro
+        </Typography>
 
-            <button onClick={handleLogout}>
-                Logout
-            </button>
-        </nav>
-    );
+        <Box display="flex" alignItems="center" gap={2}>
+          <Box textAlign="right">
+            <Typography variant="body2" fontWeight="bold">
+              {currentUser?.email?.split("@")[0]}
+            </Typography>
+
+            <Typography variant="caption">
+              {currentUser?.email}
+            </Typography>
+          </Box>
+
+          <Avatar sx={{ bgcolor: "#FF9800" }}>
+            {currentUser?.email?.charAt(0).toUpperCase()}
+          </Avatar>
+
+          <Button
+            color="inherit"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
 }
 
-export default Navbar;
+export default Navbar; 
