@@ -1,8 +1,8 @@
 import { useState } from "react";
-
 import { addTask } from "../services/taskService";
+import { auth } from "../firebaseConfig";
 
-function TaskForm() {
+function TaskForm({ onTaskAdded }) {
 
     const [title,setTitle]=useState("");
 
@@ -26,11 +26,15 @@ function TaskForm() {
 
                 description,
 
-                completed:false,
+                completed: false,
 
-                createdAt:new Date()
+                createdAt: new Date(),
+
+                userId: auth.currentUser.uid
 
             });
+
+            onTaskAdded();
 
             alert("Task Added!");
 
