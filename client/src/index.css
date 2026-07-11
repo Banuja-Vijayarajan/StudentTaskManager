@@ -1,14 +1,19 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-body {
-  background: #f4f7fc;
+body{
+
+font-family:Poppins;
+
+background:#F5F7FB;
+
 }
 
-button {
-  cursor: pointer;
+button{
+
+cursor:pointer;
+
 }

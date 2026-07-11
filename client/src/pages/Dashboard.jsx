@@ -5,7 +5,7 @@ import TaskForm from "../components/TaskForm";
 import TaskCard from "../components/TaskCard";
 
 import { auth } from "../firebaseConfig";
-import { getTasks } from "../services/taskService";
+import { subscribeToTasks } from "../services/taskService";
 
 import {
   Grid,
@@ -15,7 +15,9 @@ import {
   Divider,
   TextField,
   MenuItem,
-  InputAdornment
+  InputAdornment,
+  LinearProgress,
+  Box
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -26,24 +28,28 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
 
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const pendingTasks = tasks.length - completedTasks;
-
-  async function loadTasks() {
+  useEffect(() => {
 
     if (!auth.currentUser) return;
 
-    const data = await getTasks(auth.currentUser.uid);
+    const unsubscribe = subscribeToTasks(
+      auth.currentUser.uid,
+      (data) => {
+        setTasks(data);
+      }
+    );
 
-    setTasks(data);
-
-  }
-
-  useEffect(() => {
-
-    loadTasks();
+    return () => unsubscribe();
 
   }, []);
+
+  const completedTasks = tasks.filter(task => task.completed).length;
+  const pendingTasks = tasks.length - completedTasks;
+
+  const progress =
+    tasks.length === 0
+      ? 0
+      : Math.round((completedTasks / tasks.length) * 100);
 
   const filteredTasks = tasks.filter(task => {
 
@@ -62,9 +68,16 @@ function Dashboard() {
   return (
 
     <>
+
       <Navbar />
 
-      <div style={{ padding: "30px", maxWidth: "1200px", margin: "auto" }}>
+      <Box
+        sx={{
+          maxWidth: "1200px",
+          margin: "auto",
+          p: 4
+        }}
+      >
 
         <Typography
           variant="h4"
@@ -78,60 +91,134 @@ function Dashboard() {
           color="text.secondary"
           gutterBottom
         >
-          Here's your productivity overview.
+          Manage your tasks efficiently with TaskFlow Pro.
         </Typography>
+
+        {/* Statistics */}
 
         <Grid
           container
           spacing={3}
-          sx={{ mt: 2, mb: 5 }}
+          sx={{ mt: 2, mb: 4 }}
         >
 
           <Grid size={{ xs: 12, md: 4 }}>
+
             <Card sx={{ borderRadius: 3 }}>
+
               <CardContent>
+
                 <Typography variant="h6">
+
                   📋 Total Tasks
+
                 </Typography>
 
                 <Typography variant="h3">
+
                   {tasks.length}
+
                 </Typography>
+
               </CardContent>
+
             </Card>
+
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
+
             <Card sx={{ borderRadius: 3 }}>
+
               <CardContent>
+
                 <Typography variant="h6">
+
                   ✅ Completed
+
                 </Typography>
 
                 <Typography variant="h3">
+
                   {completedTasks}
+
                 </Typography>
+
               </CardContent>
+
             </Card>
+
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
+
             <Card sx={{ borderRadius: 3 }}>
+
               <CardContent>
+
                 <Typography variant="h6">
+
                   ⏳ Pending
+
                 </Typography>
 
                 <Typography variant="h3">
+
                   {pendingTasks}
+
                 </Typography>
+
               </CardContent>
+
             </Card>
+
           </Grid>
 
         </Grid>
 
-        <TaskForm onTaskAdded={loadTasks} />
+        {/* Progress */}
+
+        <Card
+          sx={{
+            mb: 4,
+            borderRadius: 3
+          }}
+        >
+
+          <CardContent>
+
+            <Typography
+              variant="h6"
+              gutterBottom
+            >
+
+              🎯 Overall Progress
+
+            </Typography>
+
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              sx={{
+                height: 12,
+                borderRadius: 10,
+                mb: 2
+              }}
+            />
+
+            <Typography>
+
+              {progress}% Completed
+
+            </Typography>
+
+          </CardContent>
+
+        </Card>
+
+        {/* Add Task */}
+
+        <TaskForm />
 
         <Divider sx={{ my: 4 }} />
 
@@ -140,8 +227,12 @@ function Dashboard() {
           fontWeight="bold"
           gutterBottom
         >
+
           My Tasks
+
         </Typography>
+
+        {/* Search & Filter */}
 
         <Grid
           container
@@ -150,6 +241,7 @@ function Dashboard() {
         >
 
           <Grid size={{ xs: 12, md: 8 }}>
+
             <TextField
               fullWidth
               placeholder="Search tasks..."
@@ -163,9 +255,11 @@ function Dashboard() {
                 )
               }}
             />
+
           </Grid>
 
           <Grid size={{ xs: 12, md: 4 }}>
+
             <TextField
               select
               fullWidth
@@ -173,45 +267,87 @@ function Dashboard() {
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
+
               <MenuItem value="All">All</MenuItem>
-              <MenuItem value="Study">📚 Study</MenuItem>
-              <MenuItem value="Programming">💻 Programming</MenuItem>
-              <MenuItem value="Personal">🏠 Personal</MenuItem>
-              <MenuItem value="Work">💼 Work</MenuItem>
+
+              <MenuItem value="Study">
+
+                📚 Study
+
+              </MenuItem>
+
+              <MenuItem value="Programming">
+
+                💻 Programming
+
+              </MenuItem>
+
+              <MenuItem value="Personal">
+
+                🏠 Personal
+
+              </MenuItem>
+
+              <MenuItem value="Work">
+
+                💼 Work
+
+              </MenuItem>
+
             </TextField>
+
           </Grid>
 
         </Grid>
+
+        {/* Tasks */}
 
         {
 
           filteredTasks.length === 0 ?
 
-            <Typography
-              textAlign="center"
-              color="text.secondary"
-              sx={{ mt: 6 }}
+            <Card
+              sx={{
+                p: 5,
+                textAlign: "center",
+                borderRadius: 3
+              }}
             >
 
-              No tasks found 🚀
+              <Typography
+                variant="h5"
+                gutterBottom
+              >
 
-            </Typography>
+                🚀 No Tasks Yet
+
+              </Typography>
+
+              <Typography color="text.secondary">
+
+                Create your first task and start being productive!
+
+              </Typography>
+
+            </Card>
 
             :
 
             filteredTasks.map(task => (
 
               <TaskCard
+
                 key={task.id}
+
                 task={task}
-                onTaskUpdated={loadTasks}
+
               />
 
             ))
 
         }
 
-      </div>
+      </Box>
 
     </>
 

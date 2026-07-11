@@ -1,66 +1,56 @@
 import { db } from "../firebaseConfig";
 
 import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    where,
-    doc,
-    updateDoc,
-    deleteDoc
+  collection,
+  addDoc,
+  query,
+  where,
+  doc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot
 } from "firebase/firestore";
 
 export async function addTask(task) {
-
-    return await addDoc(
-
-        collection(db, "tasks"),
-
-        task
-
-    );
-
+  return await addDoc(collection(db, "tasks"), task);
 }
 
-export async function getTasks(userId) {
+export function subscribeToTasks(userId, callback) {
 
-    const q = query(
+  const q = query(
+    collection(db, "tasks"),
+    where("userId", "==", userId)
+  );
 
-        collection(db, "tasks"),
+  return onSnapshot(q, (snapshot) => {
 
-        where("userId", "==", userId)
-
-    );
-
-    const snapshot = await getDocs(q);
-
-    return snapshot.docs.map(doc => ({
-
-        id: doc.id,
-
-        ...doc.data()
-
+    const tasks = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
     }));
+
+    callback(tasks);
+
+  });
 
 }
 
 export async function toggleTask(id, completed) {
 
-    const taskRef = doc(db, "tasks", id);
-
-    await updateDoc(taskRef, {
-        completed: !completed
-    });
+  await updateDoc(doc(db, "tasks", id), {
+    completed: !completed
+  });
 
 }
 
-export async function deleteTask(id){
+export async function deleteTask(id) {
 
-    await deleteDoc(
+  await deleteDoc(doc(db, "tasks", id));
 
-        doc(db,"tasks",id)
+}
 
-    );
+export async function editTask(id, updatedTask) {
+
+  await updateDoc(doc(db, "tasks", id), updatedTask);
 
 }
