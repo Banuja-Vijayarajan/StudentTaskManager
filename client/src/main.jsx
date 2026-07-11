@@ -6,28 +6,40 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import theme from "./theme";
+import { SnackbarProvider } from "notistack";
 
+import theme from "./theme";
 import App from "./App";
 
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 
-<React.StrictMode>
+  <React.StrictMode>
 
-<ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
 
-<CssBaseline/>
+      <CssBaseline />
 
-<BrowserRouter>
+      <SnackbarProvider
+        maxSnack={3}
+        autoHideDuration={2500}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right"
+        }}
+      >
 
-<App/>
+        <BrowserRouter>
 
-</BrowserRouter>
+          <App />
 
-</ThemeProvider>
+        </BrowserRouter>
 
-</React.StrictMode>
+      </SnackbarProvider>
+
+    </ThemeProvider>
+
+  </React.StrictMode>
 
 );
