@@ -7,6 +7,9 @@ import TaskCard from "../components/TaskCard";
 import { auth } from "../firebaseConfig";
 import { getTasks } from "../services/taskService";
 
+import { TextField, InputAdornment } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+
 import {
   Grid,
   Card,
@@ -18,9 +21,15 @@ import {
 function Dashboard() {
 
   const [tasks, setTasks] = useState([]);
+  const [search, setSearch] = useState("");
 
   const completedTasks = tasks.filter(task => task.completed).length;
   const pendingTasks = tasks.length - completedTasks;
+
+  const filteredTasks = tasks.filter(task =>
+    task.title.toLowerCase().includes(search.toLowerCase()) ||
+    task.description.toLowerCase().includes(search.toLowerCase())
+);
 
   async function loadTasks() {
 
@@ -126,17 +135,47 @@ function Dashboard() {
           gutterBottom
         >
           My Tasks
+          <TextField
+                fullWidth
+                placeholder="Search your tasks..."
+                value={search}
+                onChange={(e)=>setSearch(e.target.value)}
+                sx={{mb:4}}
+                InputProps={{
+                    startAdornment:(
+                        <InputAdornment position="start">
+                            <SearchIcon/>
+                        </InputAdornment>
+                    )
+                }}
+            />
         </Typography>
 
-        {tasks.map(task => (
+        filteredTasks.length===0?
 
-          <TaskCard
+            <Typography
+            textAlign="center"
+            color="text.secondary"
+            sx={{mt:6}}
+            >
+
+            No tasks yet.
+
+            Create your first task 🚀
+
+            </Typography>
+
+            :
+
+            filteredTasks.map(task=>(
+
+            <TaskCard
             key={task.id}
             task={task}
             onTaskUpdated={loadTasks}
-          />
+            />
 
-        ))}
+            ))
 
       </div>
 
