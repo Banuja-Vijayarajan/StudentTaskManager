@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar";
+import Analytics from "../components/Analytics";
 import TaskForm from "../components/TaskForm";
 import TaskCard from "../components/TaskCard";
 
@@ -8,16 +9,15 @@ import { auth } from "../firebaseConfig";
 import { subscribeToTasks } from "../services/taskService";
 
 import {
+  Box,
   Grid,
-  Card,
-  CardContent,
   Typography,
   Divider,
   TextField,
   MenuItem,
-  InputAdornment,
-  LinearProgress,
-  Box
+  Card,
+  CardContent,
+  InputAdornment
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -25,7 +25,9 @@ import SearchIcon from "@mui/icons-material/Search";
 function Dashboard() {
 
   const [tasks, setTasks] = useState([]);
+
   const [search, setSearch] = useState("");
+
   const [categoryFilter, setCategoryFilter] = useState("All");
 
   useEffect(() => {
@@ -33,32 +35,55 @@ function Dashboard() {
     if (!auth.currentUser) return;
 
     const unsubscribe = subscribeToTasks(
+
       auth.currentUser.uid,
+
       (data) => {
+
         setTasks(data);
+
       }
+
     );
 
     return () => unsubscribe();
 
   }, []);
 
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const pendingTasks = tasks.length - completedTasks;
+  const completedTasks = tasks.filter(
 
-  const progress =
-    tasks.length === 0
-      ? 0
-      : Math.round((completedTasks / tasks.length) * 100);
+    task => task.completed
+
+  ).length;
+
+  const pendingTasks =
+
+    tasks.length - completedTasks;
 
   const filteredTasks = tasks.filter(task => {
 
     const matchesSearch =
-      task.title.toLowerCase().includes(search.toLowerCase()) ||
-      task.description.toLowerCase().includes(search.toLowerCase());
+
+      task.title
+
+        .toLowerCase()
+
+        .includes(search.toLowerCase())
+
+      ||
+
+      task.description
+
+        .toLowerCase()
+
+        .includes(search.toLowerCase());
 
     const matchesCategory =
-      categoryFilter === "All" ||
+
+      categoryFilter === "All"
+
+      ||
+
       task.category === categoryFilter;
 
     return matchesSearch && matchesCategory;
@@ -72,49 +97,54 @@ function Dashboard() {
       <Navbar />
 
       <Box
+
         sx={{
-          maxWidth: "1200px",
-          margin: "auto",
+
+          maxWidth: 1300,
+
+          mx: "auto",
+
           p: 4
+
         }}
+
       >
 
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          gutterBottom
-        >
-          Welcome Back 👋
-        </Typography>
-
-        <Typography
-          color="text.secondary"
-          gutterBottom
-        >
-          Manage your tasks efficiently with TaskFlow Pro.
-        </Typography>
-
-        {/* Statistics */}
+        <Analytics tasks={tasks} />
 
         <Grid
+
           container
+
           spacing={3}
-          sx={{ mt: 2, mb: 4 }}
+
+          sx={{ mt: 4, mb: 4 }}
+
         >
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs:12, md:4 }}>
 
-            <Card sx={{ borderRadius: 3 }}>
+            <Card>
 
               <CardContent>
 
-                <Typography variant="h6">
+                <Typography
+
+                  variant="h6"
+
+                >
 
                   📋 Total Tasks
 
                 </Typography>
 
-                <Typography variant="h3">
+                <Typography
+
+                  variant="h3"
+
+                  fontWeight="bold"
+
+                >
 
                   {tasks.length}
 
@@ -126,19 +156,29 @@ function Dashboard() {
 
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs:12, md:4 }}>
 
-            <Card sx={{ borderRadius: 3 }}>
+            <Card>
 
               <CardContent>
 
-                <Typography variant="h6">
+                <Typography
+
+                  variant="h6"
+
+                >
 
                   ✅ Completed
 
                 </Typography>
 
-                <Typography variant="h3">
+                <Typography
+
+                  variant="h3"
+
+                  fontWeight="bold"
+
+                >
 
                   {completedTasks}
 
@@ -150,19 +190,29 @@ function Dashboard() {
 
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs:12, md:4 }}>
 
-            <Card sx={{ borderRadius: 3 }}>
+            <Card>
 
               <CardContent>
 
-                <Typography variant="h6">
+                <Typography
+
+                  variant="h6"
+
+                >
 
                   ⏳ Pending
 
                 </Typography>
 
-                <Typography variant="h3">
+                <Typography
+
+                  variant="h3"
+
+                  fontWeight="bold"
+
+                >
 
                   {pendingTasks}
 
@@ -176,99 +226,87 @@ function Dashboard() {
 
         </Grid>
 
-        {/* Progress */}
-
-        <Card
-          sx={{
-            mb: 4,
-            borderRadius: 3
-          }}
-        >
-
-          <CardContent>
-
-            <Typography
-              variant="h6"
-              gutterBottom
-            >
-
-              🎯 Overall Progress
-
-            </Typography>
-
-            <LinearProgress
-              variant="determinate"
-              value={progress}
-              sx={{
-                height: 12,
-                borderRadius: 10,
-                mb: 2
-              }}
-            />
-
-            <Typography>
-
-              {progress}% Completed
-
-            </Typography>
-
-          </CardContent>
-
-        </Card>
-
-        {/* Add Task */}
+        <Divider sx={{ mb: 4 }} />
 
         <TaskForm />
 
         <Divider sx={{ my: 4 }} />
 
         <Typography
+
           variant="h5"
+
           fontWeight="bold"
+
           gutterBottom
+
         >
 
           My Tasks
 
         </Typography>
 
-        {/* Search & Filter */}
-
         <Grid
+
           container
+
           spacing={2}
-          sx={{ mb: 3 }}
+
+          sx={{ mb: 4 }}
+
         >
 
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs:12, md:8 }}>
 
             <TextField
+
               fullWidth
+
               placeholder="Search tasks..."
+
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+
+              onChange={(e)=>setSearch(e.target.value)}
+
               InputProps={{
-                startAdornment: (
+
+                startAdornment:(
+
                   <InputAdornment position="start">
-                    <SearchIcon />
+
+                    <SearchIcon/>
+
                   </InputAdornment>
+
                 )
+
               }}
+
             />
 
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs:12, md:4 }}>
 
             <TextField
+
               select
+
               fullWidth
+
               label="Category"
+
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+
+              onChange={(e)=>setCategoryFilter(e.target.value)}
+
             >
 
-              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="All">
+
+                All
+
+              </MenuItem>
 
               <MenuItem value="Study">
 
@@ -282,15 +320,15 @@ function Dashboard() {
 
               </MenuItem>
 
-              <MenuItem value="Personal">
-
-                🏠 Personal
-
-              </MenuItem>
-
               <MenuItem value="Work">
 
                 💼 Work
+
+              </MenuItem>
+
+              <MenuItem value="Personal">
+
+                🏠 Personal
 
               </MenuItem>
 
@@ -300,50 +338,61 @@ function Dashboard() {
 
         </Grid>
 
-        {/* Tasks */}
-
         {
 
-          filteredTasks.length === 0 ?
+          filteredTasks.length===0
 
-            <Card
-              sx={{
-                p: 5,
-                textAlign: "center",
-                borderRadius: 3
-              }}
+          ?
+
+          <Card
+
+            sx={{
+
+              textAlign:"center",
+
+              p:6
+
+            }}
+
+          >
+
+            <Typography
+
+              variant="h5"
+
+              gutterBottom
+
             >
 
-              <Typography
-                variant="h5"
-                gutterBottom
-              >
+              🚀 No Tasks Found
 
-                🚀 No Tasks Yet
+            </Typography>
 
-              </Typography>
+            <Typography
 
-              <Typography color="text.secondary">
+              color="text.secondary"
 
-                Create your first task and start being productive!
+            >
 
-              </Typography>
+              Add your first task and start being productive!
 
-            </Card>
+            </Typography>
 
-            :
+          </Card>
 
-            filteredTasks.map(task => (
+          :
 
-              <TaskCard
+          filteredTasks.map(task=>(
 
-                key={task.id}
+            <TaskCard
 
-                task={task}
+              key={task.id}
 
-              />
+              task={task}
 
-            ))
+            />
+
+          ))
 
         }
 

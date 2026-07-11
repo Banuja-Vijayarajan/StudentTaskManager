@@ -1,10 +1,5 @@
 import { useState } from "react";
 
-import { auth } from "../firebaseConfig";
-import { addTask } from "../services/taskService";
-
-import { useSnackbar } from "notistack";
-
 import {
   Card,
   CardContent,
@@ -16,6 +11,11 @@ import {
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
+
+import { useSnackbar } from "notistack";
+
+import { auth } from "../firebaseConfig";
+import { addTask } from "../services/taskService";
 
 function TaskForm() {
 
@@ -33,7 +33,7 @@ function TaskForm() {
 
     if (!title.trim()) {
 
-      enqueueSnackbar("Task title is required.", {
+      enqueueSnackbar("Enter a task title", {
         variant: "warning"
       });
 
@@ -50,16 +50,13 @@ function TaskForm() {
         priority,
         category,
         dueDate,
-
         completed: false,
-
         createdAt: new Date(),
-
         userId: auth.currentUser.uid
 
       });
 
-      enqueueSnackbar("Task added successfully 🎉", {
+      enqueueSnackbar("Task Added 🎉", {
         variant: "success"
       });
 
@@ -69,11 +66,11 @@ function TaskForm() {
       setCategory("Study");
       setDueDate("");
 
-    } catch (error) {
+    }
 
-      console.error(error);
+    catch {
 
-      enqueueSnackbar("Failed to add task.", {
+      enqueueSnackbar("Failed to add task", {
         variant: "error"
       });
 
@@ -83,22 +80,18 @@ function TaskForm() {
 
   return (
 
-    <Card
-      elevation={4}
-      sx={{
-        borderRadius: 4,
-        mb: 4
-      }}
-    >
+    <Card sx={{ mb:4 }}>
 
       <CardContent>
 
         <Typography
           variant="h5"
-          fontWeight="bold"
           gutterBottom
+          fontWeight="bold"
         >
+
           ➕ Add New Task
+
         </Typography>
 
         <form onSubmit={handleSubmit}>
@@ -106,10 +99,9 @@ function TaskForm() {
           <Stack spacing={3}>
 
             <TextField
-              label="Task Title"
+              label="Title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              fullWidth
+              onChange={(e)=>setTitle(e.target.value)}
               required
             />
 
@@ -118,53 +110,54 @@ function TaskForm() {
               multiline
               rows={4}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
+              onChange={(e)=>setDescription(e.target.value)}
             />
 
             <TextField
               select
               label="Priority"
               value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              fullWidth
+              onChange={(e)=>setPriority(e.target.value)}
             >
-              <MenuItem value="High">🔴 High</MenuItem>
-              <MenuItem value="Medium">🟠 Medium</MenuItem>
-              <MenuItem value="Low">🟢 Low</MenuItem>
+
+              <MenuItem value="High">High</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="Low">Low</MenuItem>
+
             </TextField>
 
             <TextField
               select
               label="Category"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              fullWidth
+              onChange={(e)=>setCategory(e.target.value)}
             >
-              <MenuItem value="Study">📚 Study</MenuItem>
-              <MenuItem value="Programming">💻 Programming</MenuItem>
-              <MenuItem value="Personal">🏠 Personal</MenuItem>
-              <MenuItem value="Work">💼 Work</MenuItem>
+
+              <MenuItem value="Study">Study</MenuItem>
+              <MenuItem value="Programming">Programming</MenuItem>
+              <MenuItem value="Work">Work</MenuItem>
+              <MenuItem value="Personal">Personal</MenuItem>
+
             </TextField>
 
             <TextField
               type="date"
               label="Due Date"
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              onChange={(e)=>setDueDate(e.target.value)}
               InputLabelProps={{
-                shrink: true
+                shrink:true
               }}
-              fullWidth
             />
 
             <Button
-              type="submit"
               variant="contained"
-              size="large"
-              startIcon={<AddIcon />}
+              type="submit"
+              startIcon={<AddIcon/>}
             >
+
               Add Task
+
             </Button>
 
           </Stack>

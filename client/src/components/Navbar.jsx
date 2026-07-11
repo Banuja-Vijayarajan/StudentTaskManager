@@ -4,17 +4,27 @@ import {
   Typography,
   Button,
   Avatar,
-  Box
+  Box,
+  IconButton,
+  Tooltip
 } from "@mui/material";
 
 import LogoutIcon from "@mui/icons-material/Logout";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+
 import { useNavigate } from "react-router-dom";
+
 import { logoutUser } from "../services/auth";
+import { useThemeContext } from "../context/ThemeContext";
+
 import { auth } from "../firebaseConfig";
 
 function Navbar() {
 
   const navigate = useNavigate();
+
+  const { mode, toggleTheme } = useThemeContext();
 
   const currentUser = auth.currentUser;
 
@@ -26,11 +36,11 @@ function Navbar() {
 
       navigate("/");
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.error(error);
-
-      alert("Logout failed.");
 
     }
 
@@ -39,67 +49,147 @@ function Navbar() {
   return (
 
     <AppBar
-      position="static"
-      elevation={3}
+
+      position="sticky"
+
+      elevation={4}
+
       sx={{
-        background:"#5B4BDB",
-        borderRadius:"0 0 20px 20px"
+
+        background:
+
+          mode==="light"
+
+          ? "#6C63FF"
+
+          : "#1f1f1f"
+
       }}
+
     >
 
       <Toolbar
+
         sx={{
+
           display:"flex",
+
           justifyContent:"space-between"
+
         }}
+
       >
 
         <Typography
+
           variant="h5"
+
           fontWeight="bold"
+
         >
+
           🚀 TaskFlow Pro
+
         </Typography>
 
         <Box
+
           display="flex"
+
           alignItems="center"
+
           gap={2}
+
         >
 
-          <Box textAlign="right">
+          <Tooltip title="Toggle Theme">
 
-            <Typography
-              variant="body2"
-              fontWeight="bold"
+            <IconButton
+
+              color="inherit"
+
+              onClick={toggleTheme}
+
             >
 
-              {currentUser?.email?.split("@")[0]}
+              {
+
+                mode==="light"
+
+                ?
+
+                <DarkModeIcon/>
+
+                :
+
+                <LightModeIcon/>
+
+              }
+
+            </IconButton>
+
+          </Tooltip>
+
+          <Box
+
+            textAlign="right"
+
+          >
+
+            <Typography
+
+              fontWeight="bold"
+
+            >
+
+              {
+
+                currentUser?.email
+
+                ?.split("@")[0]
+
+              }
 
             </Typography>
 
-            <Typography variant="caption">
+            <Typography
 
-              {currentUser?.email}
+              variant="caption"
+
+            >
+
+              {
+
+                currentUser?.email
+
+              }
 
             </Typography>
 
           </Box>
 
-          <Avatar
-            sx={{
-              bgcolor:"#FF9800"
-            }}
-          >
+          <Avatar>
 
-            {currentUser?.email?.charAt(0).toUpperCase()}
+            {
+
+              currentUser?.email
+
+              ?.charAt(0)
+
+              .toUpperCase()
+
+            }
 
           </Avatar>
 
           <Button
+
             color="inherit"
+
             startIcon={<LogoutIcon/>}
+
             onClick={handleLogout}
+
           >
 
             Logout
