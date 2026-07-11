@@ -19,6 +19,7 @@ function TaskForm({ onTaskAdded }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
+  const [category, setCategory] = useState("Study");
   const [dueDate, setDueDate] = useState("");
 
   async function handleSubmit(e) {
@@ -33,6 +34,7 @@ function TaskForm({ onTaskAdded }) {
       title,
       description,
       priority,
+      category,
       dueDate,
       completed: false,
       createdAt: new Date(),
@@ -43,7 +45,7 @@ function TaskForm({ onTaskAdded }) {
     setDescription("");
     setPriority("Medium");
     setDueDate("");
-
+    setCategory("Study");
     onTaskAdded();
   }
 
@@ -96,6 +98,32 @@ function TaskForm({ onTaskAdded }) {
               <MenuItem value="High">🔴 High</MenuItem>
               <MenuItem value="Medium">🟡 Medium</MenuItem>
               <MenuItem value="Low">🟢 Low</MenuItem>
+            </TextField>
+
+            <TextField
+                select
+                label="Category"
+                value={category}
+                onChange={(e)=>setCategory(e.target.value)}
+                fullWidth
+                >
+
+                <MenuItem value="Study">
+                    📚 Study
+                </MenuItem>
+
+                <MenuItem value="Programming">
+                    💻 Programming
+                </MenuItem>
+
+                <MenuItem value="Personal">
+                    🏠 Personal
+                </MenuItem>
+
+                <MenuItem value="Work">
+                    💼 Work
+                </MenuItem>
+
             </TextField>
 
             <TextField

@@ -119,6 +119,18 @@ function TaskCard({ task, onTaskUpdated }) {
 
             />
 
+            <Chip
+
+                label={
+                task.category || "General"
+                }
+
+                sx={{
+                ml:1
+                }}
+
+            />
+
           </Stack>
 
           <Typography

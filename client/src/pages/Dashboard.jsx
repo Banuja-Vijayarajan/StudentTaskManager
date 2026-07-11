@@ -7,29 +7,27 @@ import TaskCard from "../components/TaskCard";
 import { auth } from "../firebaseConfig";
 import { getTasks } from "../services/taskService";
 
-import { TextField, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-
 import {
   Grid,
   Card,
   CardContent,
   Typography,
-  Divider
+  Divider,
+  TextField,
+  MenuItem,
+  InputAdornment
 } from "@mui/material";
+
+import SearchIcon from "@mui/icons-material/Search";
 
 function Dashboard() {
 
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
 
   const completedTasks = tasks.filter(task => task.completed).length;
   const pendingTasks = tasks.length - completedTasks;
-
-  const filteredTasks = tasks.filter(task =>
-    task.title.toLowerCase().includes(search.toLowerCase()) ||
-    task.description.toLowerCase().includes(search.toLowerCase())
-);
 
   async function loadTasks() {
 
@@ -47,12 +45,26 @@ function Dashboard() {
 
   }, []);
 
+  const filteredTasks = tasks.filter(task => {
+
+    const matchesSearch =
+      task.title.toLowerCase().includes(search.toLowerCase()) ||
+      task.description.toLowerCase().includes(search.toLowerCase());
+
+    const matchesCategory =
+      categoryFilter === "All" ||
+      task.category === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+
+  });
+
   return (
 
     <>
       <Navbar />
 
-      <div style={{ padding: "30px" }}>
+      <div style={{ padding: "30px", maxWidth: "1200px", margin: "auto" }}>
 
         <Typography
           variant="h4"
@@ -78,7 +90,6 @@ function Dashboard() {
           <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ borderRadius: 3 }}>
               <CardContent>
-
                 <Typography variant="h6">
                   📋 Total Tasks
                 </Typography>
@@ -86,7 +97,6 @@ function Dashboard() {
                 <Typography variant="h3">
                   {tasks.length}
                 </Typography>
-
               </CardContent>
             </Card>
           </Grid>
@@ -94,7 +104,6 @@ function Dashboard() {
           <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ borderRadius: 3 }}>
               <CardContent>
-
                 <Typography variant="h6">
                   ✅ Completed
                 </Typography>
@@ -102,7 +111,6 @@ function Dashboard() {
                 <Typography variant="h3">
                   {completedTasks}
                 </Typography>
-
               </CardContent>
             </Card>
           </Grid>
@@ -110,7 +118,6 @@ function Dashboard() {
           <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ borderRadius: 3 }}>
               <CardContent>
-
                 <Typography variant="h6">
                   ⏳ Pending
                 </Typography>
@@ -118,7 +125,6 @@ function Dashboard() {
                 <Typography variant="h3">
                   {pendingTasks}
                 </Typography>
-
               </CardContent>
             </Card>
           </Grid>
@@ -135,47 +141,75 @@ function Dashboard() {
           gutterBottom
         >
           My Tasks
-          <TextField
-                fullWidth
-                placeholder="Search your tasks..."
-                value={search}
-                onChange={(e)=>setSearch(e.target.value)}
-                sx={{mb:4}}
-                InputProps={{
-                    startAdornment:(
-                        <InputAdornment position="start">
-                            <SearchIcon/>
-                        </InputAdornment>
-                    )
-                }}
-            />
         </Typography>
 
-        filteredTasks.length===0?
+        <Grid
+          container
+          spacing={2}
+          sx={{ mb: 3 }}
+        >
+
+          <Grid size={{ xs: 12, md: 8 }}>
+            <TextField
+              fullWidth
+              placeholder="Search tasks..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              select
+              fullWidth
+              label="Category"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Study">📚 Study</MenuItem>
+              <MenuItem value="Programming">💻 Programming</MenuItem>
+              <MenuItem value="Personal">🏠 Personal</MenuItem>
+              <MenuItem value="Work">💼 Work</MenuItem>
+            </TextField>
+          </Grid>
+
+        </Grid>
+
+        {
+
+          filteredTasks.length === 0 ?
 
             <Typography
-            textAlign="center"
-            color="text.secondary"
-            sx={{mt:6}}
+              textAlign="center"
+              color="text.secondary"
+              sx={{ mt: 6 }}
             >
 
-            No tasks yet.
-
-            Create your first task 🚀
+              No tasks found 🚀
 
             </Typography>
 
             :
 
-            filteredTasks.map(task=>(
+            filteredTasks.map(task => (
 
-            <TaskCard
-            key={task.id}
-            task={task}
-            onTaskUpdated={loadTasks}
-            />
+              <TaskCard
+                key={task.id}
+                task={task}
+                onTaskUpdated={loadTasks}
+              />
 
             ))
+
+        }
 
       </div>
 
