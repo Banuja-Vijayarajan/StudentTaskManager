@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Card,
   CardContent,
@@ -10,14 +12,16 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  MenuItem
+  MenuItem,
+  Divider
 } from "@mui/material";
+
+import { useSnackbar } from "notistack";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-
-import { useState } from "react";
+import EventIcon from "@mui/icons-material/Event";
 
 import {
   toggleTask,
@@ -25,26 +29,54 @@ import {
   editTask
 } from "../services/taskService";
 
-function TaskCard({ task, onTaskUpdated }) {
+function TaskCard({ task }) {
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [priority, setPriority] = useState(task.priority);
 
+  const borderColor =
+    task.priority === "High"
+      ? "#f44336"
+      : task.priority === "Medium"
+      ? "#ff9800"
+      : "#4caf50";
+
   async function handleToggle() {
+
     await toggleTask(task.id, task.completed);
-    onTaskUpdated();
+
+    enqueueSnackbar(
+
+      task.completed
+        ? "Task marked as pending."
+        : "Task completed! 🎉",
+
+      {
+        variant: "success"
+      }
+
+    );
+
   }
 
   async function handleDelete() {
 
-    if (!window.confirm("Delete this task?")) return;
-
     await deleteTask(task.id);
 
-    onTaskUpdated();
+    enqueueSnackbar(
+      "Task deleted.",
+      {
+        variant: "error"
+      }
+    );
+
+    setDeleteOpen(false);
 
   }
 
@@ -60,9 +92,19 @@ function TaskCard({ task, onTaskUpdated }) {
 
     });
 
-    setOpen(false);
+    enqueueSnackbar(
 
-    onTaskUpdated();
+      "Task updated successfully.",
+
+      {
+
+        variant: "success"
+
+      }
+
+    );
+
+    setOpen(false);
 
   }
 
@@ -71,105 +113,194 @@ function TaskCard({ task, onTaskUpdated }) {
     <>
 
       <Card
-        elevation={4}
+
+        elevation={5}
+
         sx={{
+
           mb:3,
-          borderRadius:4
+
+          borderLeft:`8px solid ${borderColor}`,
+
+          borderRadius:4,
+
+          transition:"0.3s",
+
+          "&:hover":{
+
+            transform:"translateY(-5px)",
+
+            boxShadow:8
+
+          }
+
         }}
+
       >
 
         <CardContent>
 
           <Stack
+
             direction="row"
+
             justifyContent="space-between"
+
+            alignItems="center"
+
           >
 
             <Typography
+
               variant="h5"
+
+              fontWeight="bold"
+
               sx={{
+
                 textDecoration:
-                task.completed?
-                "line-through":
-                "none"
+
+                  task.completed
+
+                    ? "line-through"
+
+                    : "none"
+
               }}
+
             >
 
               {task.title}
 
             </Typography>
 
-            <Chip
+            <Stack direction="row" spacing={1}>
 
-              label={
-                task.completed?
-                "Completed":
-                task.priority
-              }
-
-              color={
-                task.completed?
-                "success":
-                task.priority==="High"?
-                "error":
-                task.priority==="Medium"?
-                "warning":
-                "success"
-              }
-
-            />
-
-            <Chip
+              <Chip
 
                 label={
-                task.category || "General"
+
+                  task.completed
+
+                    ? "Completed"
+
+                    : task.priority
+
                 }
 
-                sx={{
-                ml:1
-                }}
+                color={
 
-            />
+                  task.completed
+
+                    ? "success"
+
+                    : task.priority==="High"
+
+                    ? "error"
+
+                    : task.priority==="Medium"
+
+                    ? "warning"
+
+                    : "success"
+
+                }
+
+              />
+
+              <Chip
+
+                label={task.category || "General"}
+
+                color="primary"
+
+                variant="outlined"
+
+              />
+
+            </Stack>
 
           </Stack>
 
-          <Typography
-          sx={{my:2}}
-          >
+          <Typography sx={{my:2}}>
 
             {task.description}
 
           </Typography>
 
+          <Divider sx={{mb:2}}/>
+
+          {
+
+            task.dueDate && (
+
+              <Typography
+
+                color="text.secondary"
+
+                sx={{
+
+                  mb:2,
+
+                  display:"flex",
+
+                  alignItems:"center",
+
+                  gap:1
+
+                }}
+
+              >
+
+                <EventIcon fontSize="small"/>
+
+                Due: {task.dueDate}
+
+              </Typography>
+
+            )
+
+          }
+
           <Stack
-          direction="row"
-          spacing={2}
+
+            direction="row"
+
+            spacing={2}
+
           >
 
             <Button
 
-            variant="contained"
-            color="success"
+              variant="contained"
 
-            startIcon={<CheckCircleIcon/>}
+              color="success"
 
-            onClick={handleToggle}
+              startIcon={<CheckCircleIcon/>}
+
+              onClick={handleToggle}
 
             >
 
-              {task.completed?
-              "Undo":
-              "Complete"}
+              {
+
+                task.completed
+
+                  ? "Undo"
+
+                  : "Complete"
+
+              }
 
             </Button>
 
             <Button
 
-            variant="contained"
+              variant="contained"
 
-            startIcon={<EditIcon/>}
+              startIcon={<EditIcon/>}
 
-            onClick={()=>setOpen(true)}
+              onClick={()=>setOpen(true)}
 
             >
 
@@ -179,13 +310,13 @@ function TaskCard({ task, onTaskUpdated }) {
 
             <Button
 
-            variant="contained"
+              variant="contained"
 
-            color="error"
+              color="error"
 
-            startIcon={<DeleteIcon/>}
+              startIcon={<DeleteIcon/>}
 
-            onClick={handleDelete}
+              onClick={()=>setDeleteOpen(true)}
 
             >
 
@@ -199,10 +330,16 @@ function TaskCard({ task, onTaskUpdated }) {
 
       </Card>
 
+      {/* Edit Dialog */}
+
       <Dialog
-      open={open}
-      onClose={()=>setOpen(false)}
-      fullWidth
+
+        open={open}
+
+        onClose={()=>setOpen(false)}
+
+        fullWidth
+
       >
 
         <DialogTitle>
@@ -217,45 +354,45 @@ function TaskCard({ task, onTaskUpdated }) {
 
             <TextField
 
-            label="Title"
+              label="Title"
 
-            value={title}
+              value={title}
 
-            onChange={(e)=>setTitle(e.target.value)}
-
-            />
-
-            <TextField
-
-            label="Description"
-
-            multiline
-
-            rows={4}
-
-            value={description}
-
-            onChange={(e)=>setDescription(e.target.value)}
+              onChange={(e)=>setTitle(e.target.value)}
 
             />
 
             <TextField
 
-            select
+              label="Description"
 
-            label="Priority"
+              multiline
 
-            value={priority}
+              rows={4}
 
-            onChange={(e)=>setPriority(e.target.value)}
+              value={description}
+
+              onChange={(e)=>setDescription(e.target.value)}
+
+            />
+
+            <TextField
+
+              select
+
+              label="Priority"
+
+              value={priority}
+
+              onChange={(e)=>setPriority(e.target.value)}
 
             >
 
-              <MenuItem value="High">High</MenuItem>
+              <MenuItem value="High">🔴 High</MenuItem>
 
-              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="Medium">🟠 Medium</MenuItem>
 
-              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Low">🟢 Low</MenuItem>
 
             </TextField>
 
@@ -265,8 +402,62 @@ function TaskCard({ task, onTaskUpdated }) {
 
         <DialogActions>
 
+          <Button onClick={()=>setOpen(false)}>
+
+            Cancel
+
+          </Button>
+
           <Button
-          onClick={()=>setOpen(false)}
+
+            variant="contained"
+
+            onClick={handleSave}
+
+          >
+
+            Save
+
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
+
+      {/* Delete Dialog */}
+
+      <Dialog
+
+        open={deleteOpen}
+
+        onClose={()=>setDeleteOpen(false)}
+
+      >
+
+        <DialogTitle>
+
+          Delete Task
+
+        </DialogTitle>
+
+        <DialogContent>
+
+          <Typography>
+
+            Are you sure you want to delete
+
+            <strong> "{task.title}" </strong>?
+
+          </Typography>
+
+        </DialogContent>
+
+        <DialogActions>
+
+          <Button
+
+            onClick={()=>setDeleteOpen(false)}
+
           >
 
             Cancel
@@ -275,13 +466,15 @@ function TaskCard({ task, onTaskUpdated }) {
 
           <Button
 
-          variant="contained"
+            color="error"
 
-          onClick={handleSave}
+            variant="contained"
+
+            onClick={handleDelete}
 
           >
 
-            Save
+            Delete
 
           </Button>
 

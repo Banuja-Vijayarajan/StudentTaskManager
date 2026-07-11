@@ -1,6 +1,9 @@
 import { useState } from "react";
+
 import { auth } from "../firebaseConfig";
 import { addTask } from "../services/taskService";
+
+import { useSnackbar } from "notistack";
 
 import {
   Card,
@@ -8,13 +11,15 @@ import {
   Typography,
   TextField,
   Button,
-  Stack,
-  MenuItem
+  MenuItem,
+  Stack
 } from "@mui/material";
 
-import AddTaskIcon from "@mui/icons-material/AddTask";
+import AddIcon from "@mui/icons-material/Add";
 
-function TaskForm({ onTaskAdded }) {
+function TaskForm() {
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -23,40 +28,69 @@ function TaskForm({ onTaskAdded }) {
   const [dueDate, setDueDate] = useState("");
 
   async function handleSubmit(e) {
+
     e.preventDefault();
 
     if (!title.trim()) {
-      alert("Task title is required.");
+
+      enqueueSnackbar("Task title is required.", {
+        variant: "warning"
+      });
+
       return;
+
     }
 
-    await addTask({
-      title,
-      description,
-      priority,
-      category,
-      dueDate,
-      completed: false,
-      createdAt: new Date(),
-      userId: auth.currentUser.uid
-    });
+    try {
 
-    setTitle("");
-    setDescription("");
-    setPriority("Medium");
-    setDueDate("");
-    setCategory("Study");
-    onTaskAdded();
+      await addTask({
+
+        title,
+        description,
+        priority,
+        category,
+        dueDate,
+
+        completed: false,
+
+        createdAt: new Date(),
+
+        userId: auth.currentUser.uid
+
+      });
+
+      enqueueSnackbar("Task added successfully 🎉", {
+        variant: "success"
+      });
+
+      setTitle("");
+      setDescription("");
+      setPriority("Medium");
+      setCategory("Study");
+      setDueDate("");
+
+    } catch (error) {
+
+      console.error(error);
+
+      enqueueSnackbar("Failed to add task.", {
+        variant: "error"
+      });
+
+    }
+
   }
 
   return (
+
     <Card
-      elevation={5}
+      elevation={4}
       sx={{
         borderRadius: 4,
         mb: 4
       }}
     >
+
       <CardContent>
 
         <Typography
@@ -96,34 +130,21 @@ function TaskForm({ onTaskAdded }) {
               fullWidth
             >
               <MenuItem value="High">🔴 High</MenuItem>
-              <MenuItem value="Medium">🟡 Medium</MenuItem>
+              <MenuItem value="Medium">🟠 Medium</MenuItem>
               <MenuItem value="Low">🟢 Low</MenuItem>
             </TextField>
 
             <TextField
-                select
-                label="Category"
-                value={category}
-                onChange={(e)=>setCategory(e.target.value)}
-                fullWidth
-                >
-
-                <MenuItem value="Study">
-                    📚 Study
-                </MenuItem>
-
-                <MenuItem value="Programming">
-                    💻 Programming
-                </MenuItem>
-
-                <MenuItem value="Personal">
-                    🏠 Personal
-                </MenuItem>
-
-                <MenuItem value="Work">
-                    💼 Work
-                </MenuItem>
-
+              select
+              label="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="Study">📚 Study</MenuItem>
+              <MenuItem value="Programming">💻 Programming</MenuItem>
+              <MenuItem value="Personal">🏠 Personal</MenuItem>
+              <MenuItem value="Work">💼 Work</MenuItem>
             </TextField>
 
             <TextField
@@ -132,7 +153,7 @@ function TaskForm({ onTaskAdded }) {
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               InputLabelProps={{
-                shrink: true,
+                shrink: true
               }}
               fullWidth
             />
@@ -141,13 +162,7 @@ function TaskForm({ onTaskAdded }) {
               type="submit"
               variant="contained"
               size="large"
-              startIcon={<AddTaskIcon />}
-              sx={{
-                borderRadius: 3,
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1rem"
-              }}
+              startIcon={<AddIcon />}
             >
               Add Task
             </Button>
@@ -157,8 +172,11 @@ function TaskForm({ onTaskAdded }) {
         </form>
 
       </CardContent>
+
     </Card>
+
   );
+
 }
 
 export default TaskForm;
